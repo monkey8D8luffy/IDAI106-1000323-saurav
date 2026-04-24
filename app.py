@@ -78,22 +78,23 @@ def inject_ui():
     # Replace the URL below with your actual GitHub raw video URL when uploaded
     video_url = "https://cdn.pixabay.com/video/2020/05/24/40061-424683030_large.mp4" 
     
-    st.markdown(f"""
+    # NORMAL STRING for CSS (No 'f' at the beginning, so single brackets work perfectly)
+    css = """
         <style>
         /* Hide Default Streamlit Elements */
         #MainMenu, header, footer {visibility: hidden;}
-        .stApp {{ background: transparent !important; }}
+        .stApp { background: transparent !important; }
         
         /* Video Background */
-        .video-bg {{
+        .video-bg {
             position: fixed; right: 0; bottom: 0;
             min-width: 100%; min-height: 100%;
             width: auto; height: auto; z-index: -100;
             object-fit: cover; opacity: 0.85;
-        }}
+        }
         
         /* Liquid Glass Card (No Sharp Edges) */
-        .liquid-card {{
+        .liquid-card {
             background: rgba(20, 25, 40, 0.45);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
@@ -103,30 +104,30 @@ def inject_ui():
             padding: 2rem;
             color: #FFFFFF;
             margin-bottom: 1.5rem;
-        }}
+        }
 
         /* Typography */
-        * {{ font-family: 'Helvetica Neue', sans-serif; color: #FFFFFF; }}
-        h1, h2, h3 {{ font-weight: 300; }}
+        * { font-family: 'Helvetica Neue', sans-serif; color: #FFFFFF; }
+        h1, h2, h3 { font-weight: 300; }
 
         /* Navigation Bar (Matching PDF) */
-        .nav-bar {{
+        .nav-bar {
             display: flex; justify-content: space-between; align-items: center;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(20px);
             border-radius: 50px;
             padding: 0.5rem 1rem;
             margin-bottom: 2rem;
-        }}
-        .nav-item {{
+        }
+        .nav-item {
             padding: 0.8rem 1.5rem; border-radius: 30px;
             cursor: pointer; font-weight: 500; font-size: 0.9rem;
             transition: all 0.3s;
-        }}
-        .nav-item.active {{ background: rgba(255, 255, 255, 0.25); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }}
+        }
+        .nav-item.active { background: rgba(255, 255, 255, 0.25); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 
         /* Liquid Morph Animation (Breathe with Me) */
-        .liquid-morph {{
+        .liquid-morph {
             width: 250px; height: 250px;
             background: linear-gradient(135deg, rgba(79,195,247,0.5), rgba(124,77,255,0.5));
             animation: morph 8s ease-in-out infinite, breatheScale 10s ease-in-out infinite;
@@ -134,28 +135,33 @@ def inject_ui():
             font-size: 1.5rem; font-weight: bold; letter-spacing: 2px; text-transform: uppercase;
             box-shadow: 0 0 40px rgba(79,195,247,0.3);
             margin: 0 auto;
-        }}
-        @keyframes morph {{
-            0% {{ border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }}
-            50% {{ border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }}
-            100% {{ border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }}
-        }}
-        @keyframes breatheScale {{
-            0%, 100% {{ transform: scale(0.8); }}
-            40%, 60% {{ transform: scale(1.2); }}
-        }}
+        }
+        @keyframes morph {
+            0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+            50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+            100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+        }
+        @keyframes breatheScale {
+            0%, 100% { transform: scale(0.8); }
+            40%, 60% { transform: scale(1.2); }
+        }
         
         /* Interactive Elements */
-        div[data-baseweb="slider"] div {{ background: #4FC3F7 !important; }}
-        button {{ border-radius: 30px !important; }}
+        div[data-baseweb="slider"] div { background: #4FC3F7 !important; }
+        button { border-radius: 30px !important; }
         </style>
+    """
 
+    # F-STRING ONLY for the HTML video so the URL injects properly
+    html_video = f"""
         <video autoplay loop muted playsinline class="video-bg">
             <source src="{video_url}" type="video/mp4">
         </video>
-    """, unsafe_allow_html=True)
+    """
+    
+    # Combine them safely!
+    st.markdown(css + html_video, unsafe_allow_html=True)
 
-inject_ui()
 
 # ──────────────────────────────────────────────
 # 4. UTILITIES
