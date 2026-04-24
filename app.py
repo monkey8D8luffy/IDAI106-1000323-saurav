@@ -1,11 +1,13 @@
 """
-FutureForward Wellness — Liquid Glass UI (Bulletproof Version)
+FutureForward Wellness — Base64 Local Video Version
 """
 
 import streamlit as st
 import pandas as pd
 import requests
 import random
+import base64
+import os
 from datetime import datetime, timedelta
 
 # ──────────────────────────────────────────────
@@ -53,36 +55,52 @@ def fetch_calm_music(stress_level):
     except:
         pass
     
-    # Fallback Tracks
     return [
         {"name": "Deep Delta Recovery", "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", "image": "https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&w=200&q=80"},
         {"name": "Theta Brainwave Sync", "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=200&q=80"}
     ]
 
 # ──────────────────────────────────────────────
-# 3. GLOBAL CSS & CLOUD VORTEX BACKGROUND
+# 3. BASE64 VIDEO ENCODER & UI CSS
 # ──────────────────────────────────────────────
+@st.cache_data
+def get_video_base64(file_path):
+    """Reads the local MP4 file and converts it to a base64 string so it cannot be blocked."""
+    try:
+        with open(file_path, 'rb') as f:
+            data = f.read()
+        return base64.b64encode(data).decode()
+    except Exception as e:
+        return None
+
 def inject_ui():
-    # High-quality cinematic cloud GIF that Streamlit cannot block
-    bg_gif = "https://i.pinimg.com/originals/a4/96/c2/a496c2b6bc5d7fac0e09062b109e23c7.gif"
+    # Load the local video file sitting in your GitHub repo
+    video_base64 = get_video_base64("334072.mp4")
     
-    css = f"""
+    css = """
         <style>
-        /* 1. Force Streamlit to be Transparent and Apply Background */
-        [data-testid="stAppViewContainer"] {{
-            background: url("{bg_gif}") no-repeat center center fixed !important;
-            background-size: cover !important;
-        }}
-        [data-testid="stHeader"], .stApp, .main {{
-            background: transparent !important;
-        }}
-        #MainMenu, footer {{visibility: hidden;}}
+        /* Force Transparent Backgrounds */
+        #MainMenu, header, footer {visibility: hidden;}
+        .stApp, .main, [data-testid="stAppViewContainer"] { background: transparent !important; }
         
-        /* 2. Global Typography */
-        * {{ font-family: 'Helvetica Neue', sans-serif; color: #FFFFFF !important; }}
+        /* Fullscreen Video Background Styling */
+        .video-bg {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -100;
+            object-fit: cover;
+            opacity: 0.85; /* Adjust brightness here */
+        }
         
-        /* 3. Streamlit Native Button Styling (Makes them look like Glass Pills) */
-        .stButton > button {{
+        * { font-family: 'Helvetica Neue', sans-serif; color: #FFFFFF !important; }
+        
+        /* Glass Pills for Native Buttons */
+        .stButton > button {
             background: rgba(255, 255, 255, 0.1) !important;
             backdrop-filter: blur(10px) !important;
             border: 1px solid rgba(255, 255, 255, 0.3) !important;
@@ -92,15 +110,15 @@ def inject_ui():
             padding: 0.5rem 1rem !important;
             transition: all 0.3s ease !important;
             width: 100% !important;
-        }}
-        .stButton > button:hover {{
-            background: rgba(79, 195, 247, 0.3) !important;
+        }
+        .stButton > button:hover {
+            background: rgba(79, 195, 247, 0.4) !important;
             border-color: #4FC3F7 !important;
             transform: translateY(-2px);
-        }}
+        }
         
-        /* 4. Glass Box Class for HTML content */
-        .glass-box {{
+        /* Glass Box Containers */
+        .glass-box {
             background: rgba(15, 20, 30, 0.45);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
@@ -108,29 +126,40 @@ def inject_ui():
             border: 1px solid rgba(255, 255, 255, 0.15);
             padding: 2rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
             text-align: center;
-        }}
+        }
         
-        /* 5. Breathing Animation CSS */
-        .pulse-circle {{
+        /* Pulsing Circle for Breathe Page */
+        .pulse-circle {
             width: 180px; height: 180px;
-            background: radial-gradient(circle, rgba(79,195,247,0.8) 0%, rgba(124,77,255,0.4) 100%);
+            background: radial-gradient(circle, rgba(255,160,122,0.8) 0%, rgba(255,69,0,0.4) 100%);
             border-radius: 50%;
             margin: 40px auto;
             animation: pulse 8s infinite ease-in-out;
             display: flex; align-items: center; justify-content: center;
             font-size: 1.5rem; font-weight: bold; text-transform: uppercase;
-            box-shadow: 0 0 30px rgba(79,195,247,0.5);
-        }}
-        @keyframes pulse {{
-            0% {{ transform: scale(0.8); opacity: 0.6; }}
-            50% {{ transform: scale(1.4); opacity: 1; }}
-            100% {{ transform: scale(0.8); opacity: 0.6; }}
-        }}
+            box-shadow: 0 0 30px rgba(255,69,0,0.5);
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.8); opacity: 0.6; }
+            50% { transform: scale(1.4); opacity: 1; }
+            100% { transform: scale(0.8); opacity: 0.6; }
+        }
         </style>
     """
-    st.markdown(css, unsafe_allow_html=True)
+    
+    # Inject the HTML. If the video is found, embed it directly using base64 data.
+    if video_base64:
+        video_html = f"""
+            <video autoplay loop muted playsinline class="video-bg">
+                <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
+            </video>
+        """
+        st.markdown(css + video_html, unsafe_allow_html=True)
+    else:
+        st.markdown(css, unsafe_allow_html=True)
+        st.error("Video file '334072.mp4' not found. Please make sure it is uploaded directly next to app.py in GitHub.")
 
 inject_ui()
 
@@ -142,7 +171,6 @@ def navigate(page):
     st.rerun()
 
 def render_navbar():
-    # Uses Native Streamlit Columns to ensure perfect horizontal alignment
     st.write("")
     c1, c2, c3, c4 = st.columns(4)
     with c1:
@@ -165,11 +193,11 @@ def page_dashboard():
     if st.session_state.api_quote == "Loading mindfulness...":
         st.session_state.api_quote = fetch_ai_quote()
 
-    st.markdown(f'<div class="glass-box"><h2>{st.session_state.api_quote}</h2><p style="color:#4FC3F7; font-size:12px; letter-spacing:2px; text-transform:uppercase;">— AI Stress Nudge</p></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="glass-box"><h2>{st.session_state.api_quote}</h2><p style="color:#FFA07A; font-size:12px; letter-spacing:2px; text-transform:uppercase;">— AI Stress Nudge</p></div>', unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown(f'<div class="glass-box"><h3>Zen Score</h3><h1 style="color:#4FC3F7; font-size: 3.5rem;">{st.session_state.zen_score} 🌱</h1></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="glass-box"><h3>Zen Score</h3><h1 style="color:#FFA07A; font-size: 3.5rem;">{st.session_state.zen_score} 🌱</h1></div>', unsafe_allow_html=True)
     with col2:
         st.markdown('<div class="glass-box"><h3>Start Session</h3><p>Initialize the Smart Pod to begin your journey.</p><br></div>', unsafe_allow_html=True)
         if st.button("Initialize Pod ➔", key="dash_start"):
@@ -184,9 +212,9 @@ def page_moodsync():
         st.session_state.current_stress_level = st.slider("Stress Level (1=Calm, 10=Overwhelmed)", 1, 10, st.session_state.current_stress_level)
         st.write("")
         if st.session_state.current_stress_level > 6:
-            st.error("AI Protocol: High stress detected. Prescribing Deep Delta Waves and Blue Hue.")
+            st.error("AI Protocol: High stress detected. Prescribing Deep Delta Waves.")
         else:
-            st.success("AI Protocol: Balanced state. Prescribing Lo-Fi Focus and Amber Hue.")
+            st.success("AI Protocol: Balanced state. Prescribing Lo-Fi Focus.")
 
     with col2:
         st.write("### ⚙️ Session Setup")
@@ -200,14 +228,12 @@ def page_moodsync():
         navigate("Breathe With Me")
 
 def page_breathe():
-    # Hide Navbar for true immersion
     st.markdown('<style>.stButton>button:nth-child(1), hr {display:none;}</style>', unsafe_allow_html=True)
     
     st.markdown('<div class="glass-box">', unsafe_allow_html=True)
     st.write("## Follow the Rhythm")
     st.write(f"Session Duration: {st.session_state.session_timer}")
     
-    # Liquid CSS Breathing Circle
     st.markdown('<div class="pulse-circle">Breathe</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
     
@@ -249,7 +275,7 @@ def page_reflection():
     delta = st.session_state.current_stress_level - post_stress
     
     st.write("")
-    st.markdown(f'<div class="glass-box"><h2 style="color:#4FC3F7;">Stress Reduced by: {delta} levels</h2></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="glass-box"><h2 style="color:#FFA07A;">Stress Reduced by: {delta} levels</h2></div>', unsafe_allow_html=True)
     
     st.write("")
     if st.button("Save Log & Return to Dashboard ➔"):
