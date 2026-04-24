@@ -1,5 +1,5 @@
 """
-FutureForward Wellness — Dynamic Video API Version (iPad/Safari Safe)
+FutureForward Wellness — Static Image Version (100% iPad Safe)
 """
 
 import streamlit as st
@@ -58,45 +58,51 @@ def fetch_calm_music(stress_level):
         {"name": "Theta Brainwave Sync", "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=200&q=80"}
     ]
 
-def fetch_dynamic_video(stress_level):
-    """API that returns a direct MP4 URL based on stress level."""
+def fetch_dynamic_image(stress_level):
+    """API that returns a static, high-res JPG based on stress level."""
     if stress_level >= 8:
-        # High Stress: Your custom Cloudinary Video (Cloud Vortex)
-        return "https://res.cloudinary.com/dvjnuipwf/video/upload/334072_dal3rw.mp4"
+        # High Stress: Deep Space Nebula
+        return "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=2000&auto=format&fit=crop"
     elif stress_level >= 5:
-        # Medium Stress: Flowing deep ocean water
-        return "https://cdn.pixabay.com/video/2023/10/22/186008-876824300_large.mp4"
+        # Medium Stress: Soft Sunset Clouds
+        return "https://images.unsplash.com/photo-1509803874385-db7c23652552?q=80&w=2000&auto=format&fit=crop"
     else:
-        # Low Stress: Calm nature / Forest sunlight
-        return "https://cdn.pixabay.com/video/2020/02/24/32773-392636735_large.mp4"
+        # Low Stress: Calm Ocean Water
+        return "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2000&auto=format&fit=crop"
 
 # ──────────────────────────────────────────────
-# 3. GLOBAL CSS & DYNAMIC BACKGROUND INJECTION
+# 3. GLOBAL CSS & DYNAMIC STATIC BACKGROUND
 # ──────────────────────────────────────────────
 def inject_ui():
-    active_video = fetch_dynamic_video(st.session_state.current_stress_level)
+    active_image = fetch_dynamic_image(st.session_state.current_stress_level)
     
     ui_code = f"""
         <style>
-        /* CRITICAL: Force Streamlit's exact background layers to be totally transparent */
-        .stApp, .main, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {{
-            background: transparent !important;
-            background-color: transparent !important;
+        /* Force Transparent Backgrounds */
+        #MainMenu, header, footer {{visibility: hidden;}}
+        .stApp, .main {{ background: transparent !important; }}
+        
+        /* Apply Static Background Image directly to the Streamlit App Container */
+        [data-testid="stAppViewContainer"] {{
+            background-image: url("{active_image}") !important;
+            background-repeat: no-repeat !important;
+            background-position: center center !important;
+            background-attachment: fixed !important;
+            background-size: cover !important;
+            transition: background-image 0.5s ease-in-out;
         }}
         
-        #MainMenu, footer {{visibility: hidden;}}
-        
-        /* Pin the video to the very back of the screen */
-        .video-bg {{
-            position: fixed !important;
-            right: 0 !important;
-            bottom: 0 !important;
-            min-width: 100vw !important;
-            min-height: 100vh !important;
-            z-index: -9999 !important;
-            object-fit: cover !important;
-            opacity: 0.85; 
+        /* Overlay to make text readable */
+        [data-testid="stAppViewContainer"]::before {{
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 15, 25, 0.4);
+            z-index: 0;
         }}
+        
+        /* Lift content above the dark overlay */
+        .block-container {{ position: relative; z-index: 1; }}
         
         * {{ font-family: 'Helvetica Neue', sans-serif; color: #FFFFFF !important; }}
         
@@ -149,10 +155,6 @@ def inject_ui():
             100% {{ transform: scale(0.8); opacity: 0.6; }}
         }}
         </style>
-        
-        <video class="video-bg" autoplay loop muted playsinline>
-            <source src="{active_video}" type="video/mp4">
-        </video>
     """
     st.markdown(ui_code, unsafe_allow_html=True)
 
@@ -204,13 +206,13 @@ def page_moodsync():
     col1, col2 = st.columns(2)
     with col1:
         st.write("### 🎚️ How are you feeling?")
-        # Changing the slider instantly triggers the background API to swap the video!
+        # Changing the slider instantly triggers the background API to swap the static image!
         st.session_state.current_stress_level = st.slider("Stress Level (1=Calm, 10=Overwhelmed)", 1, 10, st.session_state.current_stress_level)
         st.write("")
         if st.session_state.current_stress_level >= 8:
             st.error("AI Protocol: High stress detected. Prescribing Deep Delta Waves.")
         elif st.session_state.current_stress_level >= 5:
-            st.warning("AI Protocol: Moderate stress detected. Prescribing Ocean Flow.")
+            st.warning("AI Protocol: Moderate stress detected. Prescribing Cloud Flow.")
         else:
             st.success("AI Protocol: Balanced state. Prescribing Nature Reset.")
 
