@@ -1,11 +1,10 @@
 """
-FutureForward Wellness — Stable URL Video Version
+FutureForward Wellness — Dynamic Background API Version
 """
 
 import streamlit as st
 import pandas as pd
 import requests
-import random
 from datetime import datetime, timedelta
 
 # ──────────────────────────────────────────────
@@ -32,9 +31,10 @@ def init_state():
 init_state()
 
 # ──────────────────────────────────────────────
-# 2. API FETCHERS
+# 2. AI & MEDIA API FETCHERS
 # ──────────────────────────────────────────────
 def fetch_ai_quote():
+    """Fetches a daily mindfulness quote from a free open API."""
     try:
         response = requests.get("https://zenquotes.io/api/random", timeout=3)
         data = response.json()
@@ -43,6 +43,7 @@ def fetch_ai_quote():
         return '"Peace comes from within. Do not seek it without." — Buddha'
 
 def fetch_calm_music(stress_level):
+    """Fetches royalty-free background music based on stress level."""
     tag = "ambient" if stress_level >= 7 else "lofi"
     url = f"https://api.jamendo.com/v3.0/tracks/?client_id=56d30c95&format=json&tags={tag}&limit=5&imagesize=200"
     try:
@@ -58,32 +59,52 @@ def fetch_calm_music(stress_level):
         {"name": "Theta Brainwave Sync", "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=200&q=80"}
     ]
 
+def fetch_dynamic_background(stress_level):
+    """
+    Dynamic Visual API: Returns a cinematic, looping GIF based on the user's stress level.
+    Using GIFs instead of MP4 bypasses Apple/iPad autoplay restrictions perfectly.
+    """
+    if stress_level >= 8:
+        # High Stress: Deep Space Nebula (Slow, expanding)
+        return "https://i.pinimg.com/originals/a4/96/c2/a496c2b6bc5d7fac0e09062b109e23c7.gif"
+    elif stress_level >= 4:
+        # Medium Stress: Cloud Vortex / Sky (Flowing, airy)
+        return "https://i.pinimg.com/originals/18/76/12/187612f00a5d5a7d3c8c7f2122b10905.gif"
+    else:
+        # Low Stress: Abstract Fluid / Focus (Gentle, steady)
+        return "https://i.pinimg.com/originals/4e/a3/13/4ea313c0ebcda6c28f7311ce610bbcb8.gif"
+
 # ──────────────────────────────────────────────
-# 3. GLOBAL CSS & BACKGROUND VIDEO
+# 3. GLOBAL CSS & DYNAMIC BACKGROUND INJECTION
 # ──────────────────────────────────────────────
 def inject_ui():
-    # ⬇️ PUT YOUR IMGUR/DISCORD MP4 LINK HERE IF YOU WANT YOUR CUSTOM VIDEO ⬇️
-    video_url = "https://cdn.pixabay.com/video/2020/05/24/40061-424683030_large.mp4"
+    # Fetch the correct background based on current stress state
+    active_bg = fetch_dynamic_background(st.session_state.current_stress_level)
     
     ui_code = f"""
         <style>
         /* Force Transparent Backgrounds */
         #MainMenu, header, footer {{visibility: hidden;}}
-        .stApp, .main, [data-testid="stAppViewContainer"] {{ background: transparent !important; }}
+        .stApp, .main {{ background: transparent !important; }}
         
-        /* Fullscreen Video Background Styling */
-        .video-bg {{
-            position: fixed;
-            right: 0;
-            bottom: 0;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            z-index: -100;
-            object-fit: cover;
-            opacity: 0.6; /* Adjust brightness here */
+        /* Apply Dynamic Background Image directly to the Streamlit App Container */
+        [data-testid="stAppViewContainer"] {{
+            background: url("{active_bg}") no-repeat center center fixed !important;
+            background-size: cover !important;
+            transition: background 1s ease-in-out; /* Smooth fade when switching */
         }}
+        
+        /* Overlay to make text readable */
+        [data-testid="stAppViewContainer"]::before {{
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(5, 10, 20, 0.4);
+            z-index: 0;
+        }}
+        
+        /* Lift content above the dark overlay */
+        .block-container {{ position: relative; z-index: 1; }}
         
         * {{ font-family: 'Helvetica Neue', sans-serif; color: #FFFFFF !important; }}
         
@@ -113,7 +134,7 @@ def inject_ui():
             border-radius: 25px;
             border: 1px solid rgba(255, 255, 255, 0.15);
             padding: 2rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 0.5rem;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
             text-align: center;
         }}
@@ -135,10 +156,6 @@ def inject_ui():
             100% {{ transform: scale(0.8); opacity: 0.6; }}
         }}
         </style>
-        
-        <video autoplay loop muted playsinline class="video-bg">
-            <source src="{video_url}" type="video/mp4">
-        </video>
     """
     st.markdown(ui_code, unsafe_allow_html=True)
 
@@ -180,7 +197,7 @@ def page_dashboard():
     with col1:
         st.markdown(f'<div class="glass-box"><h3>Zen Score</h3><h1 style="color:#FFA07A; font-size: 3.5rem;">{st.session_state.zen_score} 🌱</h1></div>', unsafe_allow_html=True)
     with col2:
-        st.markdown('<div class="glass-box"><h3>Start Session</h3><p>Initialize the Smart Pod to begin your journey.</p><br></div>', unsafe_allow_html=True)
+        st.markdown('<div class="glass-box" style="padding-bottom: 1rem;"><h3>Start Session</h3><p>Initialize the Smart Pod to begin your journey.</p></div>', unsafe_allow_html=True)
         if st.button("Initialize Pod ➔", key="dash_start"):
             navigate("Mood Sync")
 
@@ -190,6 +207,7 @@ def page_moodsync():
     col1, col2 = st.columns(2)
     with col1:
         st.write("### 🎚️ How are you feeling?")
+        # Changing the slider instantly triggers the background to swap!
         st.session_state.current_stress_level = st.slider("Stress Level (1=Calm, 10=Overwhelmed)", 1, 10, st.session_state.current_stress_level)
         st.write("")
         if st.session_state.current_stress_level > 6:
