@@ -1,0 +1,13 @@
+247"}
+[theme]
+base="dark"
+primaryColor="#6dd5fa"
+backgroundColor="#0e1117"
+secondaryBackgroundColor="#1c1f26"
+textColor="#ffffff"
+font="sans serif"
+
+[server]
+headless = true
+enableCORS = false
+enableXsrfProtection =
