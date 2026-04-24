@@ -1,5 +1,5 @@
 """
-FutureForward Wellness — Fixed UI & Navigation
+FutureForward Wellness — Liquid Glass UI (Bulletproof Version)
 """
 
 import streamlit as st
@@ -9,7 +9,7 @@ import random
 from datetime import datetime, timedelta
 
 # ──────────────────────────────────────────────
-# PAGE CONFIG
+# PAGE CONFIG (Must be first)
 # ──────────────────────────────────────────────
 st.set_page_config(page_title="FutureForward Wellness", page_icon="🌊", layout="wide", initial_sidebar_state="collapsed")
 
@@ -44,9 +44,7 @@ def fetch_ai_quote():
 
 def fetch_calm_music(stress_level):
     tag = "ambient" if stress_level >= 7 else "lofi"
-    client_id = "56d30c95"
-    url = f"https://api.jamendo.com/v3.0/tracks/?client_id={client_id}&format=json&tags={tag}&limit=5&imagesize=200"
-    
+    url = f"https://api.jamendo.com/v3.0/tracks/?client_id=56d30c95&format=json&tags={tag}&limit=5&imagesize=200"
     try:
         response = requests.get(url, timeout=5)
         data = response.json()
@@ -55,89 +53,110 @@ def fetch_calm_music(stress_level):
     except:
         pass
     
+    # Fallback Tracks
     return [
         {"name": "Deep Delta Recovery", "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", "image": "https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&w=200&q=80"},
         {"name": "Theta Brainwave Sync", "audio": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=200&q=80"}
     ]
 
 # ──────────────────────────────────────────────
-# 3. GLOBAL CSS & BACKGROUND VIDEO
+# 3. GLOBAL CSS & CLOUD VORTEX BACKGROUND
 # ──────────────────────────────────────────────
 def inject_ui():
-    ui_code = """
+    # High-quality cinematic cloud GIF that Streamlit cannot block
+    bg_gif = "https://i.pinimg.com/originals/a4/96/c2/a496c2b6bc5d7fac0e09062b109e23c7.gif"
+    
+    css = f"""
         <style>
-        /* Hide Default Streamlit Elements */
-        #MainMenu, header, footer {visibility: hidden;}
-        .stApp { background: transparent !important; }
+        /* 1. Force Streamlit to be Transparent and Apply Background */
+        [data-testid="stAppViewContainer"] {{
+            background: url("{bg_gif}") no-repeat center center fixed !important;
+            background-size: cover !important;
+        }}
+        [data-testid="stHeader"], .stApp, .main {{
+            background: transparent !important;
+        }}
+        #MainMenu, footer {{visibility: hidden;}}
         
-        /* Video Background */
-        .video-bg {
-            position: fixed; right: 0; bottom: 0;
-            min-width: 100%; min-height: 100%;
-            width: auto; height: auto; z-index: -100;
-            object-fit: cover; opacity: 0.7;
-        }
+        /* 2. Global Typography */
+        * {{ font-family: 'Helvetica Neue', sans-serif; color: #FFFFFF !important; }}
         
-        /* Typography */
-        * { font-family: 'Helvetica Neue', sans-serif; color: #FFFFFF; }
-
-        /* Style Streamlit Buttons to look like the Nav Bar */
-        div[data-testid="column"] button {
+        /* 3. Streamlit Native Button Styling (Makes them look like Glass Pills) */
+        .stButton > button {{
             background: rgba(255, 255, 255, 0.1) !important;
             backdrop-filter: blur(10px) !important;
             border: 1px solid rgba(255, 255, 255, 0.3) !important;
             border-radius: 30px !important;
             color: white !important;
-            font-weight: bold !important;
+            font-weight: 600 !important;
+            padding: 0.5rem 1rem !important;
             transition: all 0.3s ease !important;
-        }
-        div[data-testid="column"] button:hover {
-            background: rgba(255, 255, 255, 0.3) !important;
+            width: 100% !important;
+        }}
+        .stButton > button:hover {{
+            background: rgba(79, 195, 247, 0.3) !important;
             border-color: #4FC3F7 !important;
-        }
+            transform: translateY(-2px);
+        }}
         
-        /* Glass Cards for Content */
-        .glass-box {
-            background: rgba(20, 25, 40, 0.5);
+        /* 4. Glass Box Class for HTML content */
+        .glass-box {{
+            background: rgba(15, 20, 30, 0.45);
             backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border-radius: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             padding: 2rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-        }
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            text-align: center;
+        }}
+        
+        /* 5. Breathing Animation CSS */
+        .pulse-circle {{
+            width: 180px; height: 180px;
+            background: radial-gradient(circle, rgba(79,195,247,0.8) 0%, rgba(124,77,255,0.4) 100%);
+            border-radius: 50%;
+            margin: 40px auto;
+            animation: pulse 8s infinite ease-in-out;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; font-weight: bold; text-transform: uppercase;
+            box-shadow: 0 0 30px rgba(79,195,247,0.5);
+        }}
+        @keyframes pulse {{
+            0% {{ transform: scale(0.8); opacity: 0.6; }}
+            50% {{ transform: scale(1.4); opacity: 1; }}
+            100% {{ transform: scale(0.8); opacity: 0.6; }}
+        }}
         </style>
-
-        <video autoplay loop muted playsinline class="video-bg">
-            <source src="https://cdn.pixabay.com/video/2020/05/24/40061-424683030_large.mp4" type="video/mp4">
-        </video>
     """
-    st.markdown(ui_code, unsafe_allow_html=True)
+    st.markdown(css, unsafe_allow_html=True)
 
 inject_ui()
 
 # ──────────────────────────────────────────────
-# 4. UTILITIES (WORKING NAVIGATION)
+# 4. NAVIGATION CONTROLLER
 # ──────────────────────────────────────────────
 def navigate(page):
     st.session_state.current_page = page
     st.rerun()
 
 def render_navbar():
-    # Using Native Streamlit Buttons so they actually click!
+    # Uses Native Streamlit Columns to ensure perfect horizontal alignment
+    st.write("")
     c1, c2, c3, c4 = st.columns(4)
     with c1:
-        if st.button("Dashboard", use_container_width=True): navigate("Dashboard")
+        if st.button("Dashboard"): navigate("Dashboard")
     with c2:
-        if st.button("Mood Sync", use_container_width=True): navigate("Mood Sync")
+        if st.button("Mood Sync"): navigate("Mood Sync")
     with c3:
-        if st.button("Breathe With Me", use_container_width=True): navigate("Breathe With Me")
+        if st.button("Breathe With Me"): navigate("Breathe With Me")
     with c4:
-        if st.button("Relaxing Music", use_container_width=True): navigate("Relaxing Music")
-    st.write("---")
+        if st.button("Relaxing Music"): navigate("Relaxing Music")
+    st.markdown('<hr style="border-top: 1px solid rgba(255,255,255,0.2);">', unsafe_allow_html=True)
 
 # ──────────────────────────────────────────────
-# 5. PAGES
+# 5. PAGE MODULES
 # ──────────────────────────────────────────────
 
 def page_dashboard():
@@ -146,14 +165,14 @@ def page_dashboard():
     if st.session_state.api_quote == "Loading mindfulness...":
         st.session_state.api_quote = fetch_ai_quote()
 
-    st.markdown(f'<div class="glass-box" style="text-align:center;"><h2>{st.session_state.api_quote}</h2><p style="color:#4FC3F7;">— AI Stress Nudge</p></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="glass-box"><h2>{st.session_state.api_quote}</h2><p style="color:#4FC3F7; font-size:12px; letter-spacing:2px; text-transform:uppercase;">— AI Stress Nudge</p></div>', unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown(f'<div class="glass-box" style="text-align:center;"><h3>Zen Score</h3><h1 style="color:#4FC3F7; font-size: 4rem;">{st.session_state.zen_score} 🌱</h1></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="glass-box"><h3>Zen Score</h3><h1 style="color:#4FC3F7; font-size: 3.5rem;">{st.session_state.zen_score} 🌱</h1></div>', unsafe_allow_html=True)
     with col2:
-        st.markdown('<div class="glass-box" style="text-align:center;"><h3>Start Session</h3><p>Initialize the Smart Pod to begin your journey.</p></div>', unsafe_allow_html=True)
-        if st.button("Initialize Pod ➔", use_container_width=True):
+        st.markdown('<div class="glass-box"><h3>Start Session</h3><p>Initialize the Smart Pod to begin your journey.</p><br></div>', unsafe_allow_html=True)
+        if st.button("Initialize Pod ➔", key="dash_start"):
             navigate("Mood Sync")
 
 def page_moodsync():
@@ -161,54 +180,39 @@ def page_moodsync():
     
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown('<div class="glass-box"><h3>How are you feeling?</h3></div>', unsafe_allow_html=True)
+        st.write("### 🎚️ How are you feeling?")
         st.session_state.current_stress_level = st.slider("Stress Level (1=Calm, 10=Overwhelmed)", 1, 10, st.session_state.current_stress_level)
-        
+        st.write("")
         if st.session_state.current_stress_level > 6:
-            st.error("AI: High stress detected. Prescribing Deep Delta Waves and Blue Hue.")
+            st.error("AI Protocol: High stress detected. Prescribing Deep Delta Waves and Blue Hue.")
         else:
-            st.success("AI: Balanced state. Prescribing Lo-Fi Focus and Amber Hue.")
+            st.success("AI Protocol: Balanced state. Prescribing Lo-Fi Focus and Amber Hue.")
 
     with col2:
-        st.markdown('<div class="glass-box"><h3>Session Setup</h3></div>', unsafe_allow_html=True)
+        st.write("### ⚙️ Session Setup")
         st.session_state.session_timer = st.radio("Select Timer:", ["1 min", "5 min", "10 min", "Custom"], horizontal=True)
-        st.toggle("Smart Background Video", value=True)
-        st.toggle("Aroma Diffuser", value=True)
+        st.write("")
+        st.toggle("Smart Background Mode", value=True)
+        st.toggle("Hardware Aroma Diffuser", value=True)
 
-    st.write("")
-    if st.button("Confirm Settings & Begin Breathing ➔", use_container_width=True):
+    st.write("---")
+    if st.button("Confirm Settings & Begin Breathing ➔"):
         navigate("Breathe With Me")
 
 def page_breathe():
-    render_navbar()
+    # Hide Navbar for true immersion
+    st.markdown('<style>.stButton>button:nth-child(1), hr {display:none;}</style>', unsafe_allow_html=True)
     
-    st.markdown('<div class="glass-box" style="text-align:center;">', unsafe_allow_html=True)
+    st.markdown('<div class="glass-box">', unsafe_allow_html=True)
     st.write("## Follow the Rhythm")
-    st.write(f"Session Time: {st.session_state.session_timer}")
+    st.write(f"Session Duration: {st.session_state.session_timer}")
     
-    # Simple CSS Pulsing Animation
-    st.markdown("""
-        <style>
-        .pulse-circle {
-            width: 200px; height: 200px;
-            background: radial-gradient(circle, rgba(79,195,247,0.8) 0%, rgba(124,77,255,0.4) 100%);
-            border-radius: 50%;
-            margin: 40px auto;
-            animation: pulse 8s infinite ease-in-out;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; font-weight: bold;
-        }
-        @keyframes pulse {
-            0% { transform: scale(0.8); opacity: 0.5; }
-            50% { transform: scale(1.4); opacity: 1; }
-            100% { transform: scale(0.8); opacity: 0.5; }
-        }
-        </style>
-        <div class="pulse-circle">BREATHE</div>
-    """, unsafe_allow_html=True)
+    # Liquid CSS Breathing Circle
+    st.markdown('<div class="pulse-circle">Breathe</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
     
-    if st.button("Transition to Audio ➔", use_container_width=True):
+    st.write("")
+    if st.button("Transition to Audio & Music ➔"):
         navigate("Relaxing Music")
 
 def page_music():
@@ -217,40 +221,44 @@ def page_music():
     if not st.session_state.music_tracks:
         st.session_state.music_tracks = fetch_calm_music(st.session_state.current_stress_level)
 
-    col1, col2 = st.columns([1.2, 1])
+    col1, col2 = st.columns([1, 1])
     
     with col1:
+        st.write("### 🎧 Now Playing")
         active_track = st.session_state.music_tracks[0]
-        st.markdown(f'<div class="glass-box" style="text-align:center;"><h3>{active_track["name"]}</h3><p>▶ Currently Playing</p></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="glass-box"><h3>{active_track["name"]}</h3></div>', unsafe_allow_html=True)
         st.audio(active_track["audio"], format="audio/mp3")
 
     with col2:
-        st.markdown('<div class="glass-box"><h3>Recommended Tracks</h3>', unsafe_allow_html=True)
+        st.write("### 🎵 Recommended Queue")
+        st.markdown('<div class="glass-box" style="text-align:left;">', unsafe_allow_html=True)
         for track in st.session_state.music_tracks[1:]:
-            st.write(f"🎵 {track['name']}")
+            st.write(f"- {track['name']}")
         st.markdown('</div>', unsafe_allow_html=True)
         
-    st.write("")
-    if st.button("End Session ➔", use_container_width=True):
+    st.write("---")
+    if st.button("End Session & Reflect ➔"):
         navigate("Reflection")
 
 def page_reflection():
     render_navbar()
     
-    st.markdown('<div class="glass-box" style="text-align:center;"><h2>How much better do you feel now?</h2></div>', unsafe_allow_html=True)
+    st.markdown('<div class="glass-box"><h2>How much better do you feel now?</h2></div>', unsafe_allow_html=True)
     
-    post_stress = st.slider("Adjust Slider", 1, 10, max(1, st.session_state.current_stress_level - 3))
+    post_stress = st.slider("Adjust Slider to Current Feeling", 1, 10, max(1, st.session_state.current_stress_level - 3))
     delta = st.session_state.current_stress_level - post_stress
     
-    st.markdown(f'<div class="glass-box" style="text-align:center;"><h2 style="color:#4FC3F7;">Stress Reduced by: {delta} levels</h2></div>', unsafe_allow_html=True)
+    st.write("")
+    st.markdown(f'<div class="glass-box"><h2 style="color:#4FC3F7;">Stress Reduced by: {delta} levels</h2></div>', unsafe_allow_html=True)
     
-    if st.button("Save & Return to Dashboard", use_container_width=True):
+    st.write("")
+    if st.button("Save Log & Return to Dashboard ➔"):
         st.session_state.zen_score += 1
         st.session_state.music_tracks = [] 
         navigate("Dashboard")
 
 # ──────────────────────────────────────────────
-# 6. ROUTER
+# 6. ROUTER EXECUTION
 # ──────────────────────────────────────────────
 pages = {
     "Dashboard": page_dashboard,
