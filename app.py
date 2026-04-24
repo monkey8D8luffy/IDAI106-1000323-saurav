@@ -4,7 +4,6 @@ Matches PDF Wireframes: Dashboard → Mood Sync → Breathe With Me → Relaxing
 """
 
 import streamlit as st
-import plotly.graph_objects as go
 import pandas as pd
 import time
 import requests
@@ -74,12 +73,10 @@ def fetch_calm_music(stress_level):
 # 3. GLOBAL CSS & BACKGROUND VIDEO
 # ──────────────────────────────────────────────
 def inject_ui():
-    """Injects Liquid Glass UI, Morph Animations, and Video Background"""
-    # Replace the URL below with your actual GitHub raw video URL when uploaded
-    video_url = "https://cdn.pixabay.com/video/2020/05/24/40061-424683030_large.mp4" 
+    """Injects Liquid Glass UI, Morph Animations, and Video Background securely"""
     
-    # NORMAL STRING for CSS (No 'f' at the beginning, so single brackets work perfectly)
-    css = """
+    # We use a standard string here to avoid the Python f-string bracket bug
+    ui_code = """
         <style>
         /* Hide Default Streamlit Elements */
         #MainMenu, header, footer {visibility: hidden;}
@@ -150,18 +147,14 @@ def inject_ui():
         div[data-baseweb="slider"] div { background: #4FC3F7 !important; }
         button { border-radius: 30px !important; }
         </style>
-    """
 
-    # F-STRING ONLY for the HTML video so the URL injects properly
-    html_video = f"""
         <video autoplay loop muted playsinline class="video-bg">
-            <source src="{video_url}" type="video/mp4">
+            <source src="https://raw.githubusercontent.com/monkey8D8luffy/IDAI106-1000323-saurav/main/334072.mp4" type="video/mp4">
         </video>
     """
-    
-    # Combine them safely!
-    st.markdown(css + html_video, unsafe_allow_html=True)
+    st.markdown(ui_code, unsafe_allow_html=True)
 
+inject_ui()
 
 # ──────────────────────────────────────────────
 # 4. UTILITIES
@@ -232,7 +225,13 @@ def page_moodsync():
         navigate("Breathe With Me")
 
 def page_breathe():
-    # Locked Environment (No Navbar)
+    # Locked Environment (No Navbar) - Hides tabs as requested for this stage
+    st.markdown("""
+        <style>
+        .nav-bar { display: none !important; }
+        </style>
+    """, unsafe_allow_html=True)
+    
     st.markdown('<div class="liquid-card" style="text-align:center; margin-top: 5vh; min-height: 60vh; display:flex; flex-direction:column; justify-content:center;">', unsafe_allow_html=True)
     
     st.write("### Follow the Rhythm")
@@ -263,7 +262,8 @@ def page_music():
     with col1:
         st.markdown('<div class="liquid-card" style="text-align:center; height: 100%;">', unsafe_allow_html=True)
         active_track = st.session_state.music_tracks[0]
-        st.image(active_track["image"], width=200)
+        if "unsplash" in active_track["image"]:
+            st.image(active_track["image"], width=200)
         st.write(f"### {active_track['name']}")
         st.write("▶ Currently Playing")
         st.audio(active_track["audio"], format="audio/mp3")
