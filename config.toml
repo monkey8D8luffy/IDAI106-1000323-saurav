@@ -1,13 +1,23 @@
-
 [theme]
-base="dark"
-primaryColor="#6dd5fa"
-backgroundColor="#0e1117"
-secondaryBackgroundColor="#1c1f26"
-textColor="#ffffff"
-font="sans serif"
+# Set the base to dark mode
+base = "dark"
+
+# The primary accent color for interactive elements (sliders, toggles, active buttons)
+# We are using a calming, glowing teal to match the "Liquid Glass" vibe.
+primaryColor = "#4ECDC4"
+
+# The main background color (acts as a dark base before your ambient video loads)
+backgroundColor = "#0B0C10"
+
+# The secondary background color (used for the sidebar and some widget backgrounds)
+secondaryBackgroundColor = "#14141E"
+
+# The main text color (a soft off-white to reduce eye strain)
+textColor = "#FAFAFA"
+
+# A clean, modern sans-serif font
+font = "sans serif"
 
 [server]
-headless = true
-enableCORS = false
-enableXsrfProtection =
+# Removes the "Made with Streamlit" watermark at the bottom for a more professional look
+hide_streamlit_markers = true
