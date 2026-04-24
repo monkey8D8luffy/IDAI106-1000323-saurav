@@ -1,13 +1,11 @@
 """
-FutureForward Wellness — Base64 Local Video Version
+FutureForward Wellness — Stable URL Video Version
 """
 
 import streamlit as st
 import pandas as pd
 import requests
 import random
-import base64
-import os
 from datetime import datetime, timedelta
 
 # ──────────────────────────────────────────────
@@ -61,30 +59,20 @@ def fetch_calm_music(stress_level):
     ]
 
 # ──────────────────────────────────────────────
-# 3. BASE64 VIDEO ENCODER & UI CSS
+# 3. GLOBAL CSS & BACKGROUND VIDEO
 # ──────────────────────────────────────────────
-@st.cache_data
-def get_video_base64(file_path):
-    """Reads the local MP4 file and converts it to a base64 string so it cannot be blocked."""
-    try:
-        with open(file_path, 'rb') as f:
-            data = f.read()
-        return base64.b64encode(data).decode()
-    except Exception as e:
-        return None
-
 def inject_ui():
-    # Load the local video file sitting in your GitHub repo
-    video_base64 = get_video_base64("334072.mp4")
+    # ⬇️ PUT YOUR IMGUR/DISCORD MP4 LINK HERE IF YOU WANT YOUR CUSTOM VIDEO ⬇️
+    video_url = "https://cdn.pixabay.com/video/2020/05/24/40061-424683030_large.mp4"
     
-    css = """
+    ui_code = f"""
         <style>
         /* Force Transparent Backgrounds */
-        #MainMenu, header, footer {visibility: hidden;}
-        .stApp, .main, [data-testid="stAppViewContainer"] { background: transparent !important; }
+        #MainMenu, header, footer {{visibility: hidden;}}
+        .stApp, .main, [data-testid="stAppViewContainer"] {{ background: transparent !important; }}
         
         /* Fullscreen Video Background Styling */
-        .video-bg {
+        .video-bg {{
             position: fixed;
             right: 0;
             bottom: 0;
@@ -94,13 +82,13 @@ def inject_ui():
             height: auto;
             z-index: -100;
             object-fit: cover;
-            opacity: 0.85; /* Adjust brightness here */
-        }
+            opacity: 0.6; /* Adjust brightness here */
+        }}
         
-        * { font-family: 'Helvetica Neue', sans-serif; color: #FFFFFF !important; }
+        * {{ font-family: 'Helvetica Neue', sans-serif; color: #FFFFFF !important; }}
         
         /* Glass Pills for Native Buttons */
-        .stButton > button {
+        .stButton > button {{
             background: rgba(255, 255, 255, 0.1) !important;
             backdrop-filter: blur(10px) !important;
             border: 1px solid rgba(255, 255, 255, 0.3) !important;
@@ -110,15 +98,15 @@ def inject_ui():
             padding: 0.5rem 1rem !important;
             transition: all 0.3s ease !important;
             width: 100% !important;
-        }
-        .stButton > button:hover {
+        }}
+        .stButton > button:hover {{
             background: rgba(79, 195, 247, 0.4) !important;
             border-color: #4FC3F7 !important;
             transform: translateY(-2px);
-        }
+        }}
         
         /* Glass Box Containers */
-        .glass-box {
+        .glass-box {{
             background: rgba(15, 20, 30, 0.45);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
@@ -128,10 +116,10 @@ def inject_ui():
             margin-bottom: 1.5rem;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
             text-align: center;
-        }
+        }}
         
         /* Pulsing Circle for Breathe Page */
-        .pulse-circle {
+        .pulse-circle {{
             width: 180px; height: 180px;
             background: radial-gradient(circle, rgba(255,160,122,0.8) 0%, rgba(255,69,0,0.4) 100%);
             border-radius: 50%;
@@ -140,26 +128,19 @@ def inject_ui():
             display: flex; align-items: center; justify-content: center;
             font-size: 1.5rem; font-weight: bold; text-transform: uppercase;
             box-shadow: 0 0 30px rgba(255,69,0,0.5);
-        }
-        @keyframes pulse {
-            0% { transform: scale(0.8); opacity: 0.6; }
-            50% { transform: scale(1.4); opacity: 1; }
-            100% { transform: scale(0.8); opacity: 0.6; }
-        }
+        }}
+        @keyframes pulse {{
+            0% {{ transform: scale(0.8); opacity: 0.6; }}
+            50% {{ transform: scale(1.4); opacity: 1; }}
+            100% {{ transform: scale(0.8); opacity: 0.6; }}
+        }}
         </style>
+        
+        <video autoplay loop muted playsinline class="video-bg">
+            <source src="{video_url}" type="video/mp4">
+        </video>
     """
-    
-    # Inject the HTML. If the video is found, embed it directly using base64 data.
-    if video_base64:
-        video_html = f"""
-            <video autoplay loop muted playsinline class="video-bg">
-                <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
-            </video>
-        """
-        st.markdown(css + video_html, unsafe_allow_html=True)
-    else:
-        st.markdown(css, unsafe_allow_html=True)
-        st.error("Video file '334072.mp4' not found. Please make sure it is uploaded directly next to app.py in GitHub.")
+    st.markdown(ui_code, unsafe_allow_html=True)
 
 inject_ui()
 
